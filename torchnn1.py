@@ -1,14 +1,14 @@
 from turtle import forward, backward
 import torch
 from PIL import Image
-from torch import nn
+from torch import nn, save, load
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
 
-train = datasets.MNIST(root="data", train=True, download=True, transform=ToTensor())
+train = datasets.MNIST(root="data", train=True, download=False, transform=ToTensor())
 datasets = DataLoader(train,32)
 #1, 28, 28 - classes 0-9
 
@@ -36,14 +36,18 @@ loss_fn = nn.CrossEntropyLoss()
 optimizer = Adam(clf.parameters(), lr=1e-3)
 #Training loop
 if __name__ == '__main__':
-    with open('model.pth', 'rb') as f:
-        clf.load_state_dict(torch.load(f))
+     with open('model_state.pt', 'rb') as f:
+        clf.load_state_dict(load(f))
 
-    img = Image.open("test.jpeg").convert("L")
-    img_tensor = ToTensor()(img).unsqueeze(0).to("cpu")
-    pred =torch.argmax(clf(img_tensor))
-    print(pred)
-
+        img = Image.open('img_1.jpg')
+        img_tensor = ToTensor()(img).unsqueeze(0).to("cpu")
+        print(torch.argmax(clf(img_tensor)))
+        # img_1 = Image.open('img_2.jpg')
+        # img_tensor_1 = ToTensor()(img_1).unsqueeze(0)
+        # print(torch.argmax(clf(img_tensor_1)))
+        # img_2 = Image.open('img_3.jpg')
+        # img_tensor_2 = ToTensor()(img_2).unsqueeze(0)
+        # print(torch.argmax(clf(img_tensor_2)))
     # for epoch in range(10):
     #     for batch in datasets:
     #         x, y = batch
@@ -53,5 +57,5 @@ if __name__ == '__main__':
     #         loss.backward()
     #         optimizer.step()
     #     print(f"Epoch: {epoch} Loss: {loss.item()}")
-    # with open("model.pth", "wb") as f:
-    #     torch.save(clf.state_dict(), f)
+    # with open('model_state.pt', 'wb') as f:
+    #        save(clf.state_dict(), f)
